@@ -1,31 +1,33 @@
-const path         = require('path');
-const flash        = require('connect-flash')
-const logger       = require('morgan');
-const express      = require('express');
-const session      = require('express-session')
-const mongoose     = require('mongoose')
-const passport     = require('passport')
-const createError  = require('http-errors');
+const path = require('path');
+const flash = require('connect-flash')
+const logger = require('morgan');
+const express = require('express');
+const session = require('express-session')
+const mongoose = require('mongoose')
+const passport = require('passport')
+const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override')
 const expressValidator = require('express-validator');
 
 let MongoStore = require('connect-mongo')(session)
 
-const indexRouter    = require('./routes');
-const usersRouter    = require('./routes/users/users');
-const adminRouter    = require('./routes/admin/admin');
+const indexRouter = require('./routes');
+const usersRouter = require('./routes/users/users');
+const adminRouter = require('./routes/admin/admin');
 const productsRouter = require('./routes/products/products');
 
 const Category = require('./routes/products/models/Category')
 
 require('dotenv').config()
 
-mongoose.connect(process.env.MONGODB_URI, 
-                { useNewUrlParser: true, useUnifiedTopology: true,
-                useCreateIndex: true })
-        .then(   () => console.log('MongoDB Connected'))
-        .catch( err => console.log(`MongoDB Error: ${err}`))
+mongoose.connect(process.env.MONGODB_URI,
+    {
+        useNewUrlParser: true, useUnifiedTopology: true,
+        useCreateIndex: true
+    })
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(`MongoDB Error: ${err}`))
 
 let app = express();
 
@@ -64,7 +66,7 @@ require('./lib/passport/passport.js')(passport)
 app.use(expressValidator({
     errorFormatter: (param, message, value) => {
         let namespace = param.split('.')
-        let root      = namespace.shift()
+        let root = namespace.shift()
         let formParam = root
 
         while (namespace.length) {
@@ -72,9 +74,9 @@ app.use(expressValidator({
         }
 
         return {
-            param:   formParam,
+            param: formParam,
             message: message,
-            value:   value
+            value: value
         }
     }
 }))
@@ -82,40 +84,38 @@ app.use(expressValidator({
 app.use((req, res, next) => {
     res.locals.user = req.user
 
-    res.locals.error        = req.flash('errors')
-    res.locals.success       = req.flash('success')
-    res.locals.loginMessage  = req.flash('loginMessage')
+    res.locals.errors = req.flash('errors')
+    res.locals.success = req.flash('success')
+    res.locals.loginMessage = req.flash('loginMessage')
     res.locals.errorValidate = req.flash('errorValidate')
-    
+
     next()
 })
 
 app.use((req, res, next) => {
     Category.find({})
-            .then(categories => {
-                console.log(`res.locals.categories: `);
-                
-                res.locals.categories = categories
-
-                next()
-            })
-            .catch(error => next(error))
+        .then(categories => {
+            res.locals.categories = categories
+            next()
+        })
+        .catch(error => next(error))
 })
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
+app.use('/api/admin', adminRouter)
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
-    res.locals.error   = req.app.get('env') === 'development' ? err : {};
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // TODO: add flash
 

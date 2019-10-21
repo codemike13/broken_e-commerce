@@ -1,0 +1,33 @@
+Download Yury's e-commerce app and find the errors.
+1) Make your own js file to submit
+2) For each error you find, write down:
+- breadcrumbs (the file path)
+example: found error in routes/users/modelsl/User.js
+- write down what's wrong with it and how you fixed it.
+example: did not export file out. Fixed it by adding module.exports =
+mongoose.model('user', UserSchema) to the end of the file.
+
+3) Once you think you've fixed everything, Test the app to see any other errors.
+4) Submit the Js file with everything you wrote for #2
+
+
+
+#1 Ran 'npm i' to pull in all packages
+#2 Created .env for mongoose.connect 
+    - in /app.js
+
+#3 Changed the port from 82020 -> 3000
+    - in /bin/www
+
+#4 Changed error -> errors in locals 
+    - in /app.js
+
+#5 Added stylesheet link for css file in account.ejs to style all signin/up ejs pages.
+
+    - in /views/partials/account.ejs
+
+#6 Added app.use('/api/admin', adminRouter) to app.js 
+    -in /app.js
+
+#7 Changed resolve(str) -> resolve(hash) to store hash in DB instead of str so bcrypt.compare could work appropriately 
+    -in /routes/users/utils/hasher.js
